@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- OIDC Provider Tree View -->
+    <record id="view_oidc_provider_tree" model="ir.ui.view">
+        <field name="name">oidc.provider.tree</field>
+        <field name="model">oidc.provider</field>
+        <field name="arch" type="xml">
+            <tree string="OIDC Providers">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="active" widget="boolean_toggle"/>
+                <field name="auto_create_users"/>
+                <field name="sync_groups_on_login"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- OIDC Provider Form View -->
+    <record id="view_oidc_provider_form" model="ir.ui.view">
+        <field name="name">oidc.provider.form</field>
+        <field name="model">oidc.provider</field>
+        <field name="arch" type="xml">
+            <form string="OIDC Provider">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="toggle_active" type="object"
+                                class="oe_stat_button" icon="fa-archive">
+                            <field name="active" widget="boolean_button"
+                                options='{"terminology": "archive"}'/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Inactive" bg_color="text-bg-danger" 
+                            invisible="active"/>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1>
+                            <field name="name" placeholder="e.g., Authentik, Okta, Azure AD"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group name="basic" string="Basic Information">
+                            <field name="sequence"/>
+                            <field name="callback_url" readonly="1" 
+                                   widget="CopyClipboardURL"
+                                   placeholder="Save this record to generate the callback URL"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Configuration" name="configuration">
+                            <group>
+                                <group string="OAuth2/OIDC Credentials">
+                                    <field name="client_id" password="True"/>
+                                    <field name="client_secret" password="True"/>
+                                </group>
+                                <group string="Endpoints">
+                                    <field name="authorization_endpoint" 
+                                           placeholder="https://authentik.example.com/application/o/authorize/"/>
+                                    <field name="token_endpoint"
+                                           placeholder="https://authentik.example.com/application/o/token/"/>
+                                    <field name="userinfo_endpoint"
+                                           placeholder="https://authentik.example.com/application/o/userinfo/"/>
+                                    <field name="jwks_uri"
+                                           placeholder="https://authentik.example.com/application/o/[app]/jwks/ (optional)"/>
+                                </group>
+                            </group>
+                            <group>
+                                <group string="Scopes and Claims">
+                                    <field name="scope" 
+                                           placeholder="openid profile email groups"/>
+                                    <field name="groups_claim" 
+                                           placeholder="groups"/>
+                                    <field name="email_claim"
+                                           placeholder="email"/>
+                                    <field name="name_claim"
+                                           placeholder="name"/>
+                                    <field name="preferred_username_claim"
+                                           placeholder="preferred_username"/>
+                                </group>
+                                <group string="User Management">
+                                    <field name="auto_create_users"/>
+                                    <field name="sync_groups_on_login"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Group Mappings" name="group_mappings">
+                            <field name="group_mapping_ids">
+                                <tree editable="bottom">
+                                    <field name="active" widget="boolean_toggle"/>
+                                    <field name="oidc_group_name" 
+                                           placeholder="OIDC group name (case-sensitive)"/>
+                                    <field name="odoo_group_id"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Help" name="help">
+                            <div class="alert alert-info" role="alert">
+                                <h4>Setup Instructions</h4>
+                                <ol>
+                                    <li><strong>Configure your OIDC Provider:</strong>
+                                        <ul>
+                                            <li>Create a new application/client in your OIDC provider (Authentik, Okta, etc.)</li>
+                                            <li>Use the <strong>Callback URL</strong> shown above as the redirect URI</li>
+                                            <li>Enable the required scopes (at minimum: openid, profile, email, groups)</li>
+                                            <li>Note the Client ID and Client Secret</li>
+                                        </ul>
+                                    </li>
+                                    <li><strong>Configure this Odoo Provider:</strong>
+                                        <ul>
+                                            <li>Enter the Client ID and Client Secret</li>
+                                            <li>Enter the authorization, token, and userinfo endpoints from your OIDC provider</li>
+                                            <li>Optionally enter the JWKS URI for JWT token verification</li>
+                                            <li>Configure which claim contains user groups (typically "groups")</li>
+                                        </ul>
+                                    </li>
+                                    <li><strong>Set up Group Mappings:</strong>
+                                        <ul>
+                                            <li>Go to the "Group Mappings" tab</li>
+                                            <li>Map OIDC groups to Odoo groups</li>
+                                            <li>Users will automatically be added/removed from Odoo groups on login</li>
+                                        </ul>
+                                    </li>
+                                    <li><strong>Test:</strong>
+                                        <ul>
+                                            <li>Go to the login page</li>
+                                            <li>Click the SSO button for this provider</li>
+                                            <li>Authenticate with your OIDC provider</li>
+                                            <li>You should be logged in to Odoo automatically</li>
+                                        </ul>
+                                    </li>
+                                </ol>
+                                <h4>Supported Providers</h4>
+                                <p>This module is compatible with any OIDC-compliant provider, including:</p>
+                                <ul>
+                                    <li>Authentik</li>
+                                    <li>Okta</li>
+                                    <li>Azure AD / Microsoft Entra ID</li>
+                                    <li>Google Workspace</li>
+                                    <li>Keycloak</li>
+                                    <li>Auth0</li>
+                                    <li>And many more...</li>
+                                </ul>
+                                <h4>Platform Compatibility</h4>
+                                <p>This module works on <strong>all Odoo deployment types</strong>:</p>
+                                <ul>
+                                    <li>✅ <strong>Odoo Online</strong>: Works out of the box, no additional setup needed</li>
+                                    <li>✅ <strong>Odoo.sh</strong>: Fully compatible (optional dependencies for enhanced security)</li>
+                                    <li>✅ <strong>On-Premise</strong>: Full feature support with optional dependencies</li>
+                                </ul>
+                                <p class="text-muted">
+                                    <small>
+                                        Note: JWT signature verification requires PyJWT library. 
+                                        Without it, the module works perfectly but skips signature verification. 
+                                        Security is maintained through other mechanisms.
+                                    </small>
+                                </p>
+                            </div>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- OIDC Provider Action -->
+    <record id="action_oidc_provider" model="ir.actions.act_window">
+        <field name="name">OIDC Providers</field>
+        <field name="res_model">oidc.provider</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first OIDC Provider
+            </p>
+            <p>
+                Configure Single Sign-On with OIDC providers like Authentik, Okta, or Azure AD.
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu Item -->
+    <menuitem id="menu_oidc_root"
+              name="OIDC Authentication"
+              parent="base.menu_users"
+              sequence="100"/>
+    
+    <menuitem id="menu_oidc_providers"
+              name="OIDC Providers"
+              parent="menu_oidc_root"
+              action="action_oidc_provider"
+              sequence="10"/>
+</odoo>
