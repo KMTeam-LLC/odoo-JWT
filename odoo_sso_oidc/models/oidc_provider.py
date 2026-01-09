@@ -2,6 +2,8 @@
 import logging
 import secrets
 import json
+import urllib.request
+import urllib.parse
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
 
@@ -128,7 +130,6 @@ class OIDCProvider(models.Model):
     def _get_authorization_url(self, state, redirect_uri):
         """Generate the authorization URL for OAuth2 flow"""
         self.ensure_one()
-        import urllib.parse
         
         params = {
             'client_id': self.client_id,
@@ -166,10 +167,6 @@ class OIDCProvider(models.Model):
                 return response.json()
             else:
                 # Fallback to urllib (always available in Python)
-                import urllib.request
-                import urllib.parse
-                import json
-                
                 data_encoded = urllib.parse.urlencode(data).encode('utf-8')
                 req = urllib.request.Request(
                     self.token_endpoint,
@@ -199,9 +196,6 @@ class OIDCProvider(models.Model):
                 return response.json()
             else:
                 # Fallback to urllib (always available in Python)
-                import urllib.request
-                import json
-                
                 req = urllib.request.Request(
                     self.userinfo_endpoint,
                     headers=headers

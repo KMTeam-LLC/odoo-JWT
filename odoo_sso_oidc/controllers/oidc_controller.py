@@ -109,8 +109,18 @@ class OIDCController(http.Controller):
                 id_token_data
             )
             
-            # Log the user in
-            request.session.authenticate(request.db, login, access_token)
+            # Get the user to set up session
+            user = request.env['res.users'].sudo().search([('login', '=', login)], limit=1)
+            if not user:
+                return self._render_error(_('User authentication failed'))
+            
+            # Set up authenticated session manually
+            # We can't use password auth since OIDC users don't have passwords
+            request.session.uid = user.id
+            request.session.login = login
+            request.session.password = user.id  # Use user ID as session marker
+            request.session.context = dict(request.env.context)
+            request.session.context['uid'] = user.id
             
             _logger.info(f"User {login} successfully authenticated via OIDC")
             

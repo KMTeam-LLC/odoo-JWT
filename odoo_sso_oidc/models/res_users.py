@@ -60,7 +60,8 @@ class ResUsers(models.Model):
         if not isinstance(groups, list):
             groups = [groups] if groups else []
         
-        _logger.info(f"OIDC login attempt - sub: {sub}, email: {email}, groups: {groups}")
+        _logger.info(f"OIDC login attempt - sub: {sub[:8]}... (redacted)")
+        _logger.debug(f"OIDC login details - email: {email}, groups: {groups}")
         
         # Search for existing user by OIDC sub
         user = self.sudo().search([
@@ -98,8 +99,8 @@ class ResUsers(models.Model):
                     'oidc_provider_id': provider.id,
                     'oidc_sub': sub,
                     'active': True,
-                    # Set a random password that the user won't know (they'll use SSO)
-                    'password': None,
+                    # Disable password authentication - user must use SSO
+                    'password': False,
                 })
                 _logger.info(f"Created new user: {user.login} (id: {user.id})")
             else:
