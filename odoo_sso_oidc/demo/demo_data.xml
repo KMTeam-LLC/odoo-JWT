@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Demo OIDC Provider Configuration -->
+    <!-- This is an example configuration - replace with your actual provider details -->
+    <record id="demo_oidc_provider_authentik" model="oidc.provider">
+        <field name="name">Authentik (Demo)</field>
+        <field name="sequence">10</field>
+        <field name="active" eval="False"/><!-- Inactive by default, activate and configure -->
+        <field name="client_id">your-client-id-here</field>
+        <field name="client_secret">your-client-secret-here</field>
+        <field name="authorization_endpoint">https://authentik.example.com/application/o/authorize/</field>
+        <field name="token_endpoint">https://authentik.example.com/application/o/token/</field>
+        <field name="userinfo_endpoint">https://authentik.example.com/application/o/userinfo/</field>
+        <field name="jwks_uri">https://authentik.example.com/application/o/odoo/jwks/</field>
+        <field name="scope">openid profile email groups</field>
+        <field name="groups_claim">groups</field>
+        <field name="email_claim">email</field>
+        <field name="name_claim">name</field>
+        <field name="preferred_username_claim">preferred_username</field>
+        <field name="auto_create_users" eval="True"/>
+        <field name="sync_groups_on_login" eval="True"/>
+    </record>
+
+    <!-- Demo Group Mappings -->
+    <record id="demo_group_mapping_admin" model="oidc.group.mapping">
+        <field name="provider_id" ref="demo_oidc_provider_authentik"/>
+        <field name="oidc_group_name">odoo-admins</field>
+        <field name="odoo_group_id" ref="base.group_system"/>
+        <field name="active" eval="False"/><!-- Inactive by default -->
+    </record>
+
+    <record id="demo_group_mapping_users" model="oidc.group.mapping">
+        <field name="provider_id" ref="demo_oidc_provider_authentik"/>
+        <field name="oidc_group_name">odoo-users</field>
+        <field name="odoo_group_id" ref="base.group_user"/>
+        <field name="active" eval="False"/><!-- Inactive by default -->
+    </record>
+</odoo>

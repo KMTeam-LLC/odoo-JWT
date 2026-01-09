@@ -43,6 +43,9 @@ the module will work but skip JWT signature verification.
         'views/res_config_settings_views.xml',
         'views/webclient_templates.xml',
     ],
+    'demo': [
+        'demo/demo_data.xml',
+    ],
     'assets': {
         'web.assets_backend': [
             'odoo_sso_oidc/static/src/js/login.js',
