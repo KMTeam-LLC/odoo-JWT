@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Extend login page to show OIDC providers -->
+    <template id="login" inherit_id="web.login" name="OIDC Login Buttons">
+        <xpath expr="//form[@class='oe_login_form']" position="after">
+            <t t-if="oidc_providers">
+                <div class="o_oidc_providers mt-3">
+                    <div class="text-center mb-2">
+                        <strong>Or sign in with:</strong>
+                    </div>
+                    <t t-foreach="oidc_providers" t-as="provider">
+                        <a t-att-href="'/auth/oidc/login/%s' % provider.id" 
+                           class="btn btn-primary btn-block mb-2">
+                            <i class="fa fa-sign-in"/> Sign in with <t t-esc="provider.name"/>
+                        </a>
+                    </t>
+                </div>
+            </t>
+        </xpath>
+    </template>
+
+    <!-- Error page template -->
+    <template id="oidc_error" name="OIDC Error">
+        <t t-call="web.layout">
+            <div id="wrap" class="oe_structure oe_empty">
+                <div class="container">
+                    <div class="row justify-content-center mt-5">
+                        <div class="col-md-6">
+                            <div class="alert alert-danger" role="alert">
+                                <h4 class="alert-heading">
+                                    <i class="fa fa-exclamation-triangle"/> Authentication Error
+                                </h4>
+                                <p t-esc="error_message"/>
+                                <hr/>
+                                <p class="mb-0">
+                                    <a href="/web/login" class="btn btn-primary">
+                                        <i class="fa fa-arrow-left"/> Back to Login
+                                    </a>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>

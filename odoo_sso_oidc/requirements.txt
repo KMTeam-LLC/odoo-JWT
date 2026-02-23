@@ -1,0 +1,9 @@
+# Optional dependencies for enhanced functionality
+# These are not required but recommended for full feature support
+
+# JWT token verification (recommended for enhanced security)
+PyJWT>=2.8.0
+cryptography>=41.0.0
+
+# HTTP requests (recommended, but urllib is used as fallback)
+requests>=2.31.0
